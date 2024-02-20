@@ -1,0 +1,129 @@
+.movie__card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 388px;
+  height: 245px;
+  margin: 10px 0;
+  box-shadow: 10px 10px 15px rgba(0, 0, 0, 0.15);
+  list-style: none;
+}
+
+.card__info {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  margin-left: -3.5rem;
+}
+
+.genre {
+  background-color: rgba(250, 250, 250, 1);
+  border: 1px solid rgba(217, 217, 217, 1);
+  border-radius: 2px;
+  margin-right: 3px;
+  width: 46px;
+  height: 20px;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.overview {
+  display: -webkit-box;
+  -webkit-line-clamp: 7;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  width: 90%;
+  height: 92px;
+  line-height: 22px;
+  font-size: 12px;
+}
+
+.title {
+  display: flex;
+  justify-content: space-between;
+}
+
+h5 {
+  display: flex;
+  align-items: center;
+  width: 165px;
+  height: 28px;
+}
+
+.rate {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 35px;
+  height: 35px;
+  border: 2px;
+  border-style: solid;
+  border-color: white;
+  border-radius: 50%;
+  margin-right: 20px;
+}
+
+.rate__stars {
+  font-size: 18px;
+  margin-left: 125px;
+}
+
+.image {
+  width: 60px;
+  height: 91px;
+}
+
+@media (width > 720px) {
+  .movie__card {
+    display: flex;
+    flex-direction: row;
+    width: 451px;
+    height: 279px;
+    margin: 10px 35px 10px 0;
+    box-shadow: 10px 10px 15px rgba(0, 0, 0, 0.15);
+    list-style: none;
+  }
+
+  .card__info {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin-left: 0;
+    height: 80px;
+  }
+
+  .card__info__desktop {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    width: 55%;
+  }
+
+  .overview {
+    display: -webkit-box;
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    width: 228px;
+    height: 115px;
+    font-size: 12px;
+  }
+
+  .rate {
+    margin-right: 0;
+  }
+
+  .rate__stars {
+    font-size: 16px;
+    margin-left: 0;
+    width: 239px;
+    display: flex;
+    align-items: center;
+  }
+
+  .image {
+    width: 183px;
+    height: 281px;
+  }
+}
