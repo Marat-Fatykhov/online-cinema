@@ -5,7 +5,7 @@
   width: 388px;
   height: 245px;
   margin: 10px 0;
-  box-shadow: 10px 10px 15px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   list-style: none;
 }
 
@@ -80,7 +80,7 @@ h5 {
     width: 451px;
     height: 279px;
     margin: 10px 35px 10px 0;
-    box-shadow: 10px 10px 15px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     list-style: none;
   }
 

@@ -9,7 +9,6 @@ export const OtherInfo = ({ movie }) => {
   const { handleRateChange } = useContext(Context);
 
   const { overview, id, rating } = movie;
-
   return (
     <>
       <p className={style.overview}>{overview ? overview : 'Здесь должно было быть описание'}</p>

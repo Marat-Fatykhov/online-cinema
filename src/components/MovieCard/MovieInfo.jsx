@@ -1,13 +1,16 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 
 import style from '../../css_modules/CardInfo.module.css';
-import { genres, mounth } from '../../data';
+import { mounth } from '../../data';
+import { Context } from '../../context';
 
 export const MovieInfo = ({ title, date, genre_ids }) => {
-  let genreData = {};
+  const { genres } = useContext(Context);
 
-  genres.forEach((genre) => (genreData[genre.id] = genre.name));
+  const genresData = {};
+
+  genres.forEach((genre) => (genresData[genre.id] = genre.name));
 
   const getDate = () => {
     date = date.split('-');
@@ -25,7 +28,7 @@ export const MovieInfo = ({ title, date, genre_ids }) => {
         <span style={{ width: 210 }}>
           {genre_ids.map((id) => (
             <span className={style.genre} key={id}>
-              {id ? genreData[id] : 'Неизвестный жанр'}
+              {id ? genresData[id] : 'Неизвестный жанр'}
             </span>
           ))}
         </span>
@@ -35,7 +38,7 @@ export const MovieInfo = ({ title, date, genre_ids }) => {
 };
 
 MovieInfo.propTypes = {
-  date: PropTypes.array,
+  date: PropTypes.string,
   title: PropTypes.string,
   genre_ids: PropTypes.array,
 };

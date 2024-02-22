@@ -2,16 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { Pagination, Spin } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
 
-import style from '../css_modules/MovieContainer.module.css';
+import style from '../App.module.css';
 import { useResize } from '../use-resize';
 import { Context } from '../context';
+import { APIS } from '../apis';
 
 import InputSearch from './SearchInput';
 import { MovieCardDesktop } from './MovieCardDesktop';
 import { MovieCardMobile } from './MovieCardMobile';
-
-const API_AUTHORIZATION =
-  'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJmNmRkYmJhNjdjYzIzOGYxYjlkYTc2ZjFmZTlkMTAyZSIsInN1YiI6IjY1YmZkYmRmNDM5OTliMDE4NGM4NThjZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.TDTqMYy2qJP5gEkLFc-ni0OOr9C1EWRQNcgdJ508KC0';
 
 const MovieContainer = () => {
   const { width } = useResize();
@@ -26,7 +24,13 @@ const MovieContainer = () => {
 
   const [data, setData] = useState({});
 
-  const [rated, setRated] = useState({});
+  const [rated, setRatedMovie] = useState({});
+
+  const [genres, setGenres] = useState();
+
+  const [rate, setRate] = useState(0);
+  
+  const [ratedID, setRatedID] = useState(0);
 
   const handleChange = (value) => {
     setValue(value);
@@ -40,22 +44,59 @@ const MovieContainer = () => {
     setSearched(true);
   };
 
-  useEffect(() => {
+  const handleRateChange = (value, id) => {
+    setRate(value);
+    setRatedID(id);
+  };
+
+  const API_SEARCH = APIS.API_SEARCH.replace('{movie_name}', `${encodeURI(value)}`);
     const fetchData = async () => {
+      setIsLoading(true);
       const data = await fetch(
-        `https://api.themoviedb.org/3/search/movie?query=${encodeURI(value)}&include_adult=false&language=ru-RU&page=${page}`,
+        `${API_SEARCH}${page}`,
         {
           headers: {
             accept: 'application/json',
-            Authorization: API_AUTHORIZATION,
+            Authorization: APIS.API_AUTHORIZATION,
           },
         }
       );
       const json = await data.json();
       !data.ok ? setIsLoading(true) : setIsLoading(false);
       setData(json);
+      setIsLoading(false);
     };
 
+    const API_SET_RATE = APIS.API_RATED.replace('{movie_id}', ratedID);
+    const setRated = async () => {
+      await fetch(API_SET_RATE, {
+        method: 'POST',
+        headers: {
+          accept: 'application/json',
+          'Content-Type': 'application/json;charset=utf-8',
+          Authorization: APIS.API_AUTHORIZATION,
+        },
+        body: `{"value":${JSON.stringify(rate)}}`,
+      });
+    };
+
+    const fetchRatedData = async () => {
+      setIsLoading(true);
+      const data = await fetch(
+        `${APIS.API_RATED_LIST}${page}`,
+        {
+          headers: {
+            accept: 'application/json',
+            Authorization: APIS.API_AUTHORIZATION,
+          },
+        }
+      );
+      const res = await data.json();
+      data.ok && setRatedMovie(res);
+      setIsLoading(false);
+    };
+  
+    useEffect(() => {
     const timeout = setTimeout(() => {
       if (value.length !== 0) fetchData();
     }, 1000);
@@ -63,56 +104,38 @@ const MovieContainer = () => {
     return () => clearTimeout(timeout);
   }, [value, page]);
 
-  const [rate, setRate] = useState(0);
-  const [ratedID, setRatedID] = useState(0);
-
-  const handleRateChange = (value, id) => {
-    setRate(value);
-    setRatedID(id);
-  };
-
   useEffect(() => {
-    const setRate = async () => {
-      await fetch(`https://api.themoviedb.org/3/movie/${ratedID}/rating`, {
-        method: 'POST',
-        headers: {
-          accept: 'application/json',
-          'Content-Type': 'application/json;charset=utf-8',
-          Authorization: API_AUTHORIZATION,
-        },
-        body: `{"value":${JSON.stringify(rate)}}`,
-      });
-    };
-    ratedID && setRate();
+    ratedID && setRated();    
   }, [ratedID, rate]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const data = await fetch(
-        `https://api.themoviedb.org/3/account/20967720/rated/movies?language=en-US&page=${page}&sort_by=created_at.asc`,
-        {
-          headers: {
-            accept: 'application/json',
-            Authorization: API_AUTHORIZATION,
-          },
+    fetchRatedData();
+  }, [rate, ratedID]);
+
+  useEffect(() => {
+    const getGenre = async () => {
+      const genres = await fetch(APIS.API_GENRES, {
+        headers: {
+          accept: 'application/json',
+          Authorization: APIS.API_AUTHORIZATION
         }
-      );
-      const res = await data.json();
-      data.ok ? setIsLoading(false) : setIsLoading(true);
-      setRated(res);
+      });
+      const res = await genres.json();
+      genres.ok && setGenres(res.genres);
     };
-    const interval = setInterval(() => fetchData(), 100);
+    getGenre();
+  }, []);
 
-    return () => clearInterval(interval);
-  }, [rate, page]);
 
+  console.log(isLoading);
   return (
     <Context.Provider
       value={{
         handleRateChange,
+        genres
       }}
     >
-      <div className="task__container">
+      <div className={style.task__container}>
         <div className={style.header}>
           <button className={searched === true ? style.focus : style.tab__button} onClick={handleClickSearched}>
             Search
@@ -122,7 +145,7 @@ const MovieContainer = () => {
           </button>
         </div>
         {searched && <InputSearch onChange={handleChange} />}
-        <div className="main">
+        <div className={style.main}>
           {isLoading === true ? (
             <Spin
               indicator={
@@ -132,7 +155,7 @@ const MovieContainer = () => {
                       ? { fontSize: 50, marginTop: 50, marginLeft: 30 }
                       : width > 720 && width < 1011
                         ? { fontSize: 50, marginTop: 50, marginLeft: 450 }
-                        : { fontSize: 50, marginTop: 50, marginLeft: 30 }
+                        : { fontSize: 50, marginTop: 50, marginLeft: 450 }
                   }
                 />
               }
@@ -159,7 +182,7 @@ const MovieContainer = () => {
           )}
         </div>
         {searched
-          ? value !== '' && (
+          ? (value !== '' && !isLoading) && (
               <Pagination
                 defaultCurrent={1}
                 showSizeChanger={false}
